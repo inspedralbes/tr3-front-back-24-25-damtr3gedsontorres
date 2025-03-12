@@ -1,6 +1,14 @@
 // sync.js
 const sequelize = require("./sequelizeConfig");
 
+require("../sqlModels/Enemy.js");
+require("../sqlModels/Inventory.js");
+require("../sqlModels/Purchase.js");
+require("../sqlModels/Shop.js");
+require("../sqlModels/User.js");
+require("../sqlModels/Wave.js");
+require("../sqlModels/Weapon.js");
+
 const syncDB = async () => {
   try {
     await sequelize.sync({ alter: true }); // O { force: true } solo en desarrollo

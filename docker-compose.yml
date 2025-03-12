@@ -8,45 +8,92 @@ services:
     networks:
       - tr3_network
 
-  mongodb:
-    image: mongo
-    container_name: mongo
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: mysql
+  #   restart: always
+  #   env_file:
+  #     - .env # Carga todas las variables desde el archivo .env
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+  #     MYSQL_DATABASE: "${MYSQL_DATABASE}"
+  #     MYSQL_USER: "${MYSQL_USER}"
+  #     MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #   networks:
+  #     - tr3_network
+      
+      
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "${MONGO_USER}"
-      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tr3-sql
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: contraseña
     ports:
-      - "27017:27017"
+      - "3306:3306"
     volumes:
-      - mongo_data:/data/db
-    restart: unless-stopped
-    networks:
-      - tr3_network
+      - ./mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
-      timeout: 10s
+      timeout: 5s
       retries: 3
-
-  mongo-express:
-    image: mongo-express
-    container_name: tr3_mongo_express
-    ports:
-      - "8081:8081"
-    env_file:
-      - ./back/environment/.env  # Carga las variables del archivo .env
-    environment:
-      ME_CONFIG_BASICAUTH_USERNAME: "${MONGO_USER}"
-      ME_CONFIG_BASICAUTH_PASSWORD: "${MONGO_PASSWORD}"
-      ME_CONFIG_MONGODB_AUTH_DATABASE: "${MONGO_DB}"  # Base de datos para autenticación
-      ME_CONFIG_MONGODB_AUTH_USERNAME: "${MONGO_USER}"  # Expande correctamente la variable
-      ME_CONFIG_MONGODB_AUTH_PASSWORD: "${MONGO_PASSWORD}"  # Expande correctamente la variable
-      ME_CONFIG_MONGODB_SERVER: mongo  # Nombre del contenedor MongoDB
-
-    restart: unless-stopped
-    depends_on:
-      - mongodb
     networks:
       - tr3_network
+
+
+  # mongodb:
+  #   image: mongo
+  #   container_name: mongo
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: "${MONGO_USER}"
+  #     MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}"
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
+  #   restart: unless-stopped
+  #   networks:
+  #     - tr3_network
+  #   healthcheck:
+  #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 3
+
+  # mongo-express:
+  #   image: mongo-express
+  #   container_name: tr3_mongo_express
+  #   ports:
+  #     - "8081:8081"
+  #   env_file:
+  #     - ./back/environment/.env  # Carga las variables del archivo .env
+  #   environment:
+  #     ME_CONFIG_BASICAUTH_USERNAME: "${MONGO_USER}"
+  #     ME_CONFIG_BASICAUTH_PASSWORD: "${MONGO_PASSWORD}"
+  #     ME_CONFIG_MONGODB_AUTH_DATABASE: "${MONGO_DB}"  # Base de datos para autenticación
+  #     ME_CONFIG_MONGODB_AUTH_USERNAME: "${MONGO_USER}"  # Expande correctamente la variable
+  #     ME_CONFIG_MONGODB_AUTH_PASSWORD: "${MONGO_PASSWORD}"  # Expande correctamente la variable
+  #     ME_CONFIG_MONGODB_SERVER: mongo  # Nombre del contenedor MongoDB
+
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mongodb
+  #   networks:
+  #     - tr3_network
 
   frontend:
     build:
@@ -56,9 +103,6 @@ services:
     restart: always
     ports:
       - "4000:4000"
-    volumes:
-      - ./front/vuetify-project:/app/frontend
-      - /app/frontend
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
@@ -73,17 +117,19 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    volumes:
-      - ./back:/app/backend
-      - ./back/environment/.env:/app/backend/environment/.env
-    depends_on:
-      mongodb:
-        condition: service_healthy  # <- Añadir condición de salud
+    # depends_on:
+    #   mongodb:
+    #     condition: service_healthy  # <- Añadir condición de salud
     networks:
       - tr3_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: sh -c "node database/config/sync.js && npm run dev"
 
 networks:
-  tr3_network:  # Definición de la red
+  tr3_network:
+    # Definición de la red
     driver: bridge
 volumes:
   mysql_data:

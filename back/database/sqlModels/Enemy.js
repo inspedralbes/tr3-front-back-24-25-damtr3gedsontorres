@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../db");
+const sequelize = require("../config/sequelizeConfig");
 
 const Enemy = sequelize.define("Enemy", {
   name: { type: DataTypes.STRING, allowNull: false },

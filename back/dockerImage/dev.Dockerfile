@@ -17,7 +17,7 @@ COPY . .
 EXPOSE 3000
 
 # Ejecutar el script de sincronización al iniciar el contenedor
-RUN node database/config/mongoConfig.js
+# RUN node database/config/sync.js 
 
 # Instal·lem nodemon com a dependència global per al desenvolupament
 RUN npm install -g nodemon

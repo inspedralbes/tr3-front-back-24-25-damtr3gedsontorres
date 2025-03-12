@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../db");
+const sequelize = require("../config/sequelizeConfig");
 const Enemy = require("./Enemy");
 
 const Wave = sequelize.define("Wave", {
