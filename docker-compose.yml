@@ -1,19 +1,19 @@
 services:
-  # adminer:
-  #   image: adminer
-  #   container_name: tr3_adminer
-  #   restart: always
-  #   ports:
-  #     - "8080:8080"
-  #   networks:
-  #     - tr3_network
+  adminer:
+    image: adminer
+    container_name: tr3_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - tr3_network
 
   # # mysql:
   # #   image: mysql:8.0
   # #   container_name: mysql
   # #   restart: always
   # #   env_file:
-  # #     - .env # Carga todas las variables desde el archivo .env
+  # #     - .env 
   # #   environment:
   # #     MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
   # #     MYSQL_DATABASE: "${MYSQL_DATABASE}"
@@ -33,26 +33,26 @@ services:
       
       
 
-  # mysql:
-  #   image: mysql:8.0
-  #   container_name: mysql
-  #   restart: always
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: rootpassword
-  #     MYSQL_DATABASE: tr3-sql
-  #     MYSQL_USER: admin
-  #     MYSQL_PASSWORD: contraseña
-  #   ports:
-  #     - "3306:3306"
-  #   volumes:
-  #     - ./mysql_data:/var/lib/mysql
-  #   healthcheck:
-  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #   networks:
-  #     - tr3_network
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tr3-sql
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: contraseña
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - tr3_network
 
 
   # mongodb:
@@ -95,6 +95,44 @@ services:
   #   networks:
   #     - tr3_network
 
+  mongodb:
+    image: mongo
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    networks:
+      - tr3_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  mongo-express:
+    image: mongo-express
+    container_name: tr3_mongo_express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: example
+      # ME_CONFIG_MONGODB_AUTH_DATABASE: tr3_mongo_db  # Base de datos para autenticación
+      ME_CONFIG_MONGODB_AUTH_USERNAME: root  # Usuario de MongoDB
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: example  # Contraseña de MongoDB
+      ME_CONFIG_MONGODB_URL: "mongodb://root:example@mongo:27017"
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - tr3_network
+
+
   frontend:
     build:
       context: ./front
@@ -120,14 +158,14 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    # depends_on:
-    #   mongodb:
-    #     condition: service_healthy  # <- Añadir condición de salud
     networks:
       - tr3_network
-    # depends_on:
-    #   mysql:
-    #     condition: service_healthy
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy  # <- Añadir condición de salud
+    command: sh -c "node database/config/sync.js && node database/config/mongoConfig.js && npm run dev"
 
 networks:
   tr3_network:
