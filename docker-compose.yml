@@ -1,58 +1,58 @@
 services:
-  adminer:
-    image: adminer
-    container_name: tr3_adminer
-    restart: always
-    ports:
-      - "8080:8080"
-    networks:
-      - tr3_network
+  # adminer:
+  #   image: adminer
+  #   container_name: tr3_adminer
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - tr3_network
+
+  # # mysql:
+  # #   image: mysql:8.0
+  # #   container_name: mysql
+  # #   restart: always
+  # #   env_file:
+  # #     - .env # Carga todas las variables desde el archivo .env
+  # #   environment:
+  # #     MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+  # #     MYSQL_DATABASE: "${MYSQL_DATABASE}"
+  # #     MYSQL_USER: "${MYSQL_USER}"
+  # #     MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+  # #   ports:
+  # #     - "3306:3306"
+  # #   volumes:
+  # #     - mysql_data:/var/lib/mysql
+  # #   healthcheck:
+  # #     test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+  # #     interval: 10s
+  # #     timeout: 5s
+  # #     retries: 3
+  # #   networks:
+  # #     - tr3_network
+      
+      
 
   # mysql:
   #   image: mysql:8.0
   #   container_name: mysql
   #   restart: always
-  #   env_file:
-  #     - .env # Carga todas las variables desde el archivo .env
   #   environment:
-  #     MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-  #     MYSQL_DATABASE: "${MYSQL_DATABASE}"
-  #     MYSQL_USER: "${MYSQL_USER}"
-  #     MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+  #     MYSQL_ROOT_PASSWORD: rootpassword
+  #     MYSQL_DATABASE: tr3-sql
+  #     MYSQL_USER: admin
+  #     MYSQL_PASSWORD: contraseña
   #   ports:
   #     - "3306:3306"
   #   volumes:
-  #     - mysql_data:/var/lib/mysql
+  #     - ./mysql_data:/var/lib/mysql
   #   healthcheck:
-  #     test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
   #     interval: 10s
   #     timeout: 5s
   #     retries: 3
   #   networks:
   #     - tr3_network
-      
-      
-
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: tr3-sql
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: contraseña
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    networks:
-      - tr3_network
 
 
   # mongodb:
@@ -106,6 +106,9 @@ services:
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
+    volumes:
+    - ./front/vuetify-project:/app/frontend  # Monta el código dentro del contenedor
+    - /app/frontend/node_modules  # Evita sobrescribir node_modules
     networks:
       - tr3_network
 
@@ -122,10 +125,9 @@ services:
     #     condition: service_healthy  # <- Añadir condición de salud
     networks:
       - tr3_network
-    depends_on:
-      mysql:
-        condition: service_healthy
-    command: sh -c "node database/config/sync.js && npm run dev"
+    # depends_on:
+    #   mysql:
+    #     condition: service_healthy
 
 networks:
   tr3_network:
