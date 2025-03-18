@@ -165,7 +165,7 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy  # <- Añadir condición de salud
-    command: sh -c "node database/config/sync.js && node database/config/mongoConfig.js && npm run dev"
+    command: sh -c "npm run dev"
 
 networks:
   tr3_network:

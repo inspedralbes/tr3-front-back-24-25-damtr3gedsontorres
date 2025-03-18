@@ -1,23 +1,33 @@
 // sync.js
 const sequelize = require("./sequelizeConfig");
 
-require("../sqlModels/Enemy.js");
-require("../sqlModels/Inventory.js");
-require("../sqlModels/Purchase.js");
-require("../sqlModels/Shop.js");
-require("../sqlModels/User.js");
-require("../sqlModels/Wave.js");
-require("../sqlModels/Weapon.js");
+// Importar todos los modelos desde el archivo index.js
+require("../sqlModels");
 
-const syncDB = async () => {
+const syncDB = async (exitAfterSync = false) => {
   try {
     await sequelize.sync({ alter: true }); // O { force: true } solo en desarrollo
     console.log("✅ Base de datos sincronizada correctamente.");
-    process.exit(); // Finaliza el proceso para que el contenedor no quede colgado
+    
+    if (exitAfterSync) {
+      process.exit(0); // Solo finaliza el proceso si se solicita explícitamente
+    }
+    
+    return true; // Indica que la sincronización fue exitosa
   } catch (error) {
     console.error("❌ Error al sincronizar la base de datos:", error);
-    process.exit(1);
+    
+    if (exitAfterSync) {
+      process.exit(1); // Solo finaliza el proceso con error si se solicita explícitamente
+    }
+    
+    return false; // Indica que la sincronización falló
   }
 };
 
-syncDB();
+// Si este archivo se ejecuta directamente (no como un módulo importado)
+if (require.main === module) {
+  syncDB(true); // Ejecutar con salida automática si se ejecuta como script independiente
+}
+
+module.exports = syncDB; // Exportar la función para que pueda ser utilizada en otros archivos
