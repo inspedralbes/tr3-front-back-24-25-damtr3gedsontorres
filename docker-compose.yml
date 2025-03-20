@@ -147,6 +147,8 @@ services:
     volumes:
     - ./front/vuetify-project:/app/frontend  # Monta el código dentro del contenedor
     - /app/frontend/node_modules  # Evita sobrescribir node_modules
+    depends_on:
+      - backend
     networks:
       - tr3_network
 
@@ -165,6 +167,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy  # <- Añadir condición de salud
+    volumes:
+      - ./back/index.js:/app/backend/index.js  # Monta el código dentro del contenedor
     command: sh -c "npm run dev"
 
 networks:

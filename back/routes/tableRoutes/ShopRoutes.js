@@ -1,5 +1,5 @@
 const express = require("express");
-const { Shop } = require("../database/sqlModels");
+const { Shop } = require("../../database/sqlModels");
 const { Op } = require("sequelize");
 
 const router = express.Router();

@@ -1,5 +1,5 @@
 const express = require("express");
-const { Inventory, User, Shop } = require("../database/sqlModels");
+const { Inventory, User, Shop } = require("../../database/sqlModels");
 
 const router = express.Router();
 

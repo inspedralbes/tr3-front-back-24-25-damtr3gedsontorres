@@ -12,13 +12,13 @@ const sequelize = require('./database/config/sequelizeConfig');
 const syncDB = require('./database/config/sync');
 
 // Importar rutas
-const EnemyRoutes = require('./routes/EneRoutes');
-const InventoryRoutes = require('./routes/InventoryRoutes');
-const PurchaseRoutes = require('./routes/PurchaseRoutes');
-const ShopRoutes = require('./routes/ShopRoutes');
-const UserRoutes = require('./routes/UserRoutes');
-const WaveRoutes = require('./routes/WaveRoutes');
-const WeaponRoutes = require('./routes/WeaponRoutes');
+const EnemyRoutes = require('./routes/tableRoutes/EneRoutes');
+const InventoryRoutes = require('./routes/tableRoutes/InventoryRoutes');
+const PurchaseRoutes = require('./routes/tableRoutes/PurchaseRoutes');
+const ShopRoutes = require('./routes/tableRoutes/ShopRoutes');
+const UserRoutes = require('./routes/tableRoutes/UserRoutes');
+const WaveRoutes = require('./routes/tableRoutes/WaveRoutes');
+const WeaponRoutes = require('./routes/tableRoutes/WeaponRoutes');
 
 // Crear la aplicación Express
 const app = express();

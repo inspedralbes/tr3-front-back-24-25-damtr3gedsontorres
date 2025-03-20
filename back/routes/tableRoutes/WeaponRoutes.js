@@ -1,5 +1,5 @@
 const express = require("express");
-const { Weapon } = require("../database/sqlModels");
+const { Weapon } = require("../../database/sqlModels");
 
 const router = express.Router();
 

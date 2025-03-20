@@ -1,5 +1,5 @@
 const express = require("express");
-const { Wave, Enemy } = require("../database/sqlModels");
+const { Wave, Enemy } = require("../../database/sqlModels");
 
 const router = express.Router();
 
