@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '../components/Dashboard.vue'
-import Enemies from '../components/Enemies.vue'
-import Inventory from '../components/Inventory.vue'
-import Purchase from '../components/Purchase.vue'
-import User from '../components/User.vue'
-import Shop from '../components/Shop.vue'
-import Weapon from '../components/Weapon.vue'
-import Wave from '../components/Wave.vue'
+import Dashboard from '../components/AdminTables/Dashboard.vue'
+import Enemies from '../components/AdminTables/Enemies.vue'
+import Inventory from '../components/AdminTables/Inventory.vue'
+import Purchase from '../components/AdminTables/Purchase.vue'
+import User from '../components/AdminTables/User.vue'
+import Shop from '../components/AdminTables/Shop.vue'
+import Weapon from '../components/AdminTables/Weapon.vue'
+import Wave from '../components/AdminTables/Wave.vue'
 
 const routes = [
   {
