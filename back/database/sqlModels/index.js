@@ -6,6 +6,7 @@ const Shop = require('./Shop');
 const User = require('./User');
 const Wave = require('./Wave');
 const Weapon = require('./Weapon');
+const Player = require('./Player');
 
 // Exportar todos los modelos
 module.exports = {
@@ -15,5 +16,6 @@ module.exports = {
   Shop,
   User,
   Wave,
-  Weapon
+  Weapon,
+  Player
 };

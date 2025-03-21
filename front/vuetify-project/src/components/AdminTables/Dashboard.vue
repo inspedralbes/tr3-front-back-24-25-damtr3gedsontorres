@@ -1,20 +1,32 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { logout } from '@/services/authService'
 
+const router = useRouter()
 const isSidebarOpen = ref(true)
 
 const menuItems = [
-  { path: '/enemies', name: 'Enemigos', icon: '👾' },
-  { path: '/inventory', name: 'Inventario', icon: '🎒' },
-  { path: '/purchase', name: 'Compras', icon: '💰' },
-  { path: '/user', name: 'Usuario', icon: '👤' },
-  { path: '/shop', name: 'Tienda', icon: '🏪' },
-  { path: '/weapon', name: 'Armas', icon: '⚔️' },
-  { path: '/wave', name: 'Oleadas', icon: '🌊' }
+  { path: '/admin/enemies', name: 'Enemigos', icon: '👾' },
+  { path: '/admin/inventory', name: 'Inventario', icon: '🎒' },
+  { path: '/admin/purchase', name: 'Compras', icon: '💰' },
+  { path: '/admin/user', name: 'Usuario', icon: '👤' },
+  { path: '/admin/shop', name: 'Tienda', icon: '🏪' },
+  { path: '/admin/weapon', name: 'Armas', icon: '⚔️' },
+  { path: '/admin/wave', name: 'Oleadas', icon: '🌊' }
+]
+
+const adminItems = [
+  { path: '/admin/register', name: 'Registrar Admin', icon: '👑' }
 ]
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
+}
+
+const handleLogout = () => {
+  logout()
+  router.push('/login')
 }
 </script>
 
@@ -35,6 +47,7 @@ const toggleSidebar = () => {
       </div>
       
       <nav class="sidebar-nav">
+        <h3 class="nav-section-title">Gestión del Juego</h3>
         <ul>
           <li v-for="item in menuItems" :key="item.path">
             <router-link :to="item.path" class="nav-link">
@@ -43,7 +56,24 @@ const toggleSidebar = () => {
             </router-link>
           </li>
         </ul>
+        
+        <h3 class="nav-section-title">Administración</h3>
+        <ul>
+          <li v-for="item in adminItems" :key="item.path">
+            <router-link :to="item.path" class="nav-link">
+              <span class="icon">{{ item.icon }}</span>
+              <span class="text">{{ item.name }}</span>
+            </router-link>
+          </li>
+        </ul>
       </nav>
+      
+      <div class="sidebar-footer">
+        <button @click="handleLogout" class="logout-btn">
+          <span class="icon">🚪</span>
+          <span class="text">Cerrar Sesión</span>
+        </button>
+      </div>
     </aside>
 
     <main class="content" :class="{ 'expanded': !isSidebarOpen }">
@@ -121,6 +151,17 @@ const toggleSidebar = () => {
 
 .sidebar-nav {
   padding: 20px 10px;
+  flex: 1;
+}
+
+.nav-section-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 20px 20px 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-nav ul {
@@ -167,6 +208,30 @@ const toggleSidebar = () => {
   margin-left: -250px;
 }
 
+.sidebar-footer {
+  padding: 15px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* Transition animations */
 .fade-enter-active,
 .fade-leave-active {
@@ -200,8 +265,7 @@ const toggleSidebar = () => {
   }
   
   .content {
-    margin-left: 0;
-    padding: 20px;
+    width: 100%;
   }
   
   .toggle-btn {

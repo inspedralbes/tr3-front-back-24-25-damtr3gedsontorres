@@ -1,0 +1,162 @@
+/**
+ * Servicio para gestionar la autenticación de usuarios
+ * Utiliza fetch para las peticiones HTTP
+ */
+
+import { fetchWithAuth } from './httpInterceptor';
+
+// URL base para las llamadas a la API, utilizando variable de entorno o valor por defecto
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+// Clave para almacenar el token en localStorage
+const TOKEN_KEY = 'admin_auth_token';
+// Clave para almacenar los datos del usuario en localStorage
+const USER_KEY = 'admin_user_data';
+
+/**
+ * Registra el primer administrador en el sistema
+ * @param {Object} userData - Datos del administrador (username, password, email)
+ * @returns {Promise<Object>} Datos del administrador registrado
+ */
+export const registerFirstAdmin = async (userData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register-first-admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error en el registro');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al registrar primer administrador:', error);
+    throw error;
+  }
+};
+
+/**
+ * Registra un nuevo administrador (requiere estar autenticado como admin)
+ * @param {Object} userData - Datos del administrador (username, password, email)
+ * @returns {Promise<Object>} Datos del administrador registrado
+ */
+export const registerAdmin = async (userData) => {
+  try {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/register-admin`, {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error en el registro');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al registrar administrador:', error);
+    throw error;
+  }
+};
+
+/**
+ * Inicia sesión con credenciales de administrador
+ * @param {Object} credentials - Credenciales (username, password)
+ * @returns {Promise<Object>} Datos del usuario y token
+ */
+export const login = async (credentials) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error en el inicio de sesión');
+    }
+    
+    const data = await response.json();
+    
+    // Guardar token y datos del usuario en localStorage
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    
+    return data;
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    throw error;
+  }
+};
+
+/**
+ * Cierra la sesión del usuario actual
+ */
+export const logout = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  
+  // Redirigir al login si estamos en el navegador
+  if (typeof window !== 'undefined') {
+    window.location.href = '/login';
+  }
+};
+
+/**
+ * Obtiene la información del usuario actual
+ * @returns {Object|null} Datos del usuario o null si no hay usuario autenticado
+ */
+export const getCurrentUser = () => {
+  try {
+    const userStr = localStorage.getItem(USER_KEY);
+    return userStr ? JSON.parse(userStr) : null;
+  } catch (error) {
+    console.error('Error al obtener usuario actual:', error);
+    return null;
+  }
+};
+
+/**
+ * Verifica si hay un usuario autenticado
+ * @returns {Boolean} True si hay un usuario autenticado
+ */
+export const isAuthenticated = () => {
+  return !!localStorage.getItem(TOKEN_KEY);
+};
+
+/**
+ * Verifica si el usuario actual es administrador
+ * @returns {Boolean} True si el usuario es administrador
+ */
+export const isAdmin = () => {
+  try {
+    const user = getCurrentUser();
+    return user && user.role === 'admin';
+  } catch (error) {
+    console.error('Error al verificar si es admin:', error);
+    return false;
+  }
+};
+
+/**
+ * Obtiene el token de autenticación
+ * @returns {String|null} Token de autenticación o null si no hay
+ */
+export const getAuthToken = () => {
+  return localStorage.getItem(TOKEN_KEY);
+};
+
+export default {
+  registerFirstAdmin,
+  registerAdmin,
+  login,
+  logout,
+  getCurrentUser,
+  isAuthenticated,
+  isAdmin,
+  getAuthToken
+};

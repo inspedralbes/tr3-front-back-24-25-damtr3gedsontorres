@@ -2,6 +2,8 @@
  * Servicio para gestionar las operaciones relacionadas con las compras (Purchases)
  */
 
+import { fetchWithAuth } from './httpInterceptor';
+
 // URL base para las llamadas a la API, utilizando variable de entorno o valor por defecto
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -11,7 +13,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 const fetchPurchases = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/purchases/`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/purchases/`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -32,7 +34,7 @@ const fetchPurchases = async () => {
  */
 const fetchPurchasesByUser = async (userId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/purchases/user/${userId}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/purchases/user/${userId}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -53,7 +55,7 @@ const fetchPurchasesByUser = async (userId) => {
  */
 const fetchPurchaseById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/purchases/${id}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/purchases/${id}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -89,7 +91,7 @@ const savePurchase = async (purchase, isUpdate = false) => {
       shopId: Number(purchase.shopId)
     };
     
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers: {
         'Content-Type': 'application/json'
@@ -116,7 +118,7 @@ const savePurchase = async (purchase, isUpdate = false) => {
  */
 const deletePurchase = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/purchases/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/purchases/${id}`, {
       method: 'DELETE'
     });
     
@@ -138,7 +140,7 @@ const deletePurchase = async (id) => {
  */
 const fetchPurchaseStats = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/purchases/stats`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/purchases/stats`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
