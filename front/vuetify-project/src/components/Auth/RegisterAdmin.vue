@@ -59,7 +59,7 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn text @click="goToDashboard">Volver al dashboard</v-btn>
+        <v-btn text @click="goToDashboard">Volver al login</v-btn>
         <v-spacer></v-spacer>
         <v-btn 
           color="primary" 
@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { registerAdmin, isAuthenticated, isAdmin } from '@/services/authService';
+import { registerAdmin } from '@/services/authService';
 
 export default {
   name: 'RegisterAdminView',
@@ -110,10 +110,7 @@ export default {
     };
   },
   created() {
-    // Verificar si el usuario está autenticado y es admin
-    if (!isAuthenticated() || !isAdmin()) {
-      this.$router.push('/login');
-    }
+    // Ya no necesitamos verificar si el usuario está autenticado
   },
   methods: {
     async register() {
@@ -130,10 +127,12 @@ export default {
           password: this.password
         });
         
-        this.success = 'Administrador registrado correctamente';
+        this.success = 'Administrador registrado correctamente. Redirigiendo al dashboard...';
         
-        // Limpiar el formulario
-        this.$refs.form.reset();
+        // Redirigir al dashboard después de 2 segundos
+        setTimeout(() => {
+          this.$router.push('/admin/dashboard');
+        }, 2000);
       } catch (error) {
         this.error = error.message || 'Error al registrar el administrador';
       } finally {
@@ -141,7 +140,7 @@ export default {
       }
     },
     goToDashboard() {
-      this.$router.push('/admin/dashboard');
+      this.$router.push('/login');
     }
   }
 };

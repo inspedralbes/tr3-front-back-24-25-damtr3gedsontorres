@@ -8,7 +8,6 @@ import Shop from '../components/AdminTables/Shop.vue'
 import Weapon from '../components/AdminTables/Weapon.vue'
 import Wave from '../components/AdminTables/Wave.vue'
 import LoginPage from '../pages/Auth/LoginPage.vue'
-import RegisterFirstAdminPage from '../pages/Auth/RegisterFirstAdminPage.vue'
 import RegisterAdminPage from '../pages/Auth/RegisterAdminPage.vue'
 import { isAuthenticated, isAdmin } from '../services/authService'
 
@@ -23,11 +22,6 @@ const routes = [
     component: LoginPage
   },
   {
-    path: '/register-first-admin',
-    name: 'RegisterFirstAdmin',
-    component: RegisterFirstAdminPage
-  },
-  {
     path: '/admin',
     redirect: '/admin/dashboard'
   },
@@ -36,7 +30,7 @@ const routes = [
     component: Dashboard,
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
-      { path: '', redirect: '/admin/enemies' },
+      { path: '', component: Enemies, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'enemies', component: Enemies, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'inventory', component: Inventory, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'purchase', component: Purchase, meta: { requiresAuth: true, requiresAdmin: true } },
@@ -49,8 +43,7 @@ const routes = [
   {
     path: '/admin/register',
     name: 'RegisterAdmin',
-    component: RegisterAdminPage,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    component: RegisterAdminPage
   },
   // Ruta de fallback
   {

@@ -14,13 +14,13 @@ const TOKEN_KEY = 'admin_auth_token';
 const USER_KEY = 'admin_user_data';
 
 /**
- * Registra el primer administrador en el sistema
+ * Registra un nuevo administrador
  * @param {Object} userData - Datos del administrador (username, password, email)
  * @returns {Promise<Object>} Datos del administrador registrado
  */
-export const registerFirstAdmin = async (userData) => {
+export const registerAdmin = async (userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/register-first-admin`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register-admin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
@@ -31,31 +31,13 @@ export const registerFirstAdmin = async (userData) => {
       throw new Error(errorData.error || 'Error en el registro');
     }
     
-    return await response.json();
-  } catch (error) {
-    console.error('Error al registrar primer administrador:', error);
-    throw error;
-  }
-};
-
-/**
- * Registra un nuevo administrador (requiere estar autenticado como admin)
- * @param {Object} userData - Datos del administrador (username, password, email)
- * @returns {Promise<Object>} Datos del administrador registrado
- */
-export const registerAdmin = async (userData) => {
-  try {
-    const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/register-admin`, {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    });
+    const data = await response.json();
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Error en el registro');
-    }
+    // Guardar el token y los datos del usuario
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
     
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('Error al registrar administrador:', error);
     throw error;
@@ -151,7 +133,6 @@ export const getAuthToken = () => {
 };
 
 export default {
-  registerFirstAdmin,
   registerAdmin,
   login,
   logout,

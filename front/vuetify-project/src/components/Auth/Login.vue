@@ -11,6 +11,9 @@
               <v-alert v-if="error" type="error" class="mb-4">
                 {{ error }}
               </v-alert>
+              <v-alert v-if="success" type="success" class="mb-4">
+                {{ success }}
+              </v-alert>
               <v-text-field
                 v-model="username"
                 label="Nombre de usuario"
@@ -31,29 +34,23 @@
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showPassword = !showPassword"
                 required
+                @keyup.enter="login"
               ></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
+            <v-btn text @click="goToRegisterAdmin">Registrarse como Admin</v-btn>
             <v-spacer></v-spacer>
             <v-btn 
               color="primary" 
               @click="login" 
               :loading="loading"
               :disabled="!valid || loading"
+              type="submit"
             >
               Iniciar sesión
             </v-btn>
           </v-card-actions>
-          <v-card-text class="text-center" v-if="!adminExists">
-            <v-btn 
-              color="secondary" 
-              text 
-              @click="goToRegisterFirstAdmin"
-            >
-              Registrar primer administrador
-            </v-btn>
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -73,7 +70,7 @@ export default {
       password: '',
       showPassword: false,
       error: null,
-      adminExists: true, // Por defecto asumimos que ya hay admins
+      success: null,
       usernameRules: [
         v => !!v || 'El nombre de usuario es obligatorio',
         v => v.length >= 3 || 'El nombre de usuario debe tener al menos 3 caracteres'
@@ -84,39 +81,39 @@ export default {
       ]
     };
   },
-  async created() {
-    // Verificar si ya existe algún administrador
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/auth/check-admin-exists`);
-      if (response.ok) {
-        const data = await response.json();
-        this.adminExists = data.exists;
-      }
-    } catch (error) {
-      console.error('Error al verificar administradores:', error);
-      this.adminExists = false; // Si hay error, permitimos registrar
-    }
-  },
   methods: {
     async login() {
-      if (!this.$refs.form.validate()) return;
+      console.log('Método login ejecutado');
+      if (!this.$refs.form.validate()) {
+        console.log('Validación del formulario fallida');
+        return;
+      }
       
       this.loading = true;
       this.error = null;
       
       try {
-        await login({ username: this.username, password: this.password });
-        // Redirigir al dashboard después del login exitoso
-        this.$router.push('/admin/dashboard');
+        console.log('Intentando iniciar sesión con:', { username: this.username });
+        const result = await login({ username: this.username, password: this.password });
+        console.log('Login exitoso:', result);
+        
+        // Mostrar mensaje de éxito
+        this.success = 'Inicio de sesión exitoso. Redirigiendo al dashboard...';
+        
+        // Esperar un momento antes de redirigir para asegurar que el token se ha guardado
+        setTimeout(() => {
+          console.log('Redirigiendo al dashboard...');
+          this.$router.push('/admin/dashboard');
+        }, 1000);
       } catch (error) {
+        console.error('Error completo:', error);
         this.error = error.message || 'Error al iniciar sesión';
-        console.error('Error detallado:', error);
       } finally {
         this.loading = false;
       }
     },
-    goToRegisterFirstAdmin() {
-      this.$router.push('/register-first-admin');
+    goToRegisterAdmin() {
+      this.$router.push('/admin/register');
     }
   }
 };

@@ -82,10 +82,10 @@ router.post('/register-first-admin', async (req, res) => {
 
 /**
  * @route POST /api/auth/register-admin
- * @desc Registrar un nuevo administrador (requiere permisos de administrador)
- * @access Private/Admin
+ * @desc Registrar un nuevo administrador
+ * @access Public
  */
-router.post('/register-admin', [verifyToken, isAdmin], async (req, res) => {
+router.post('/register-admin', async (req, res) => {
   try {
     const { username, password, email } = req.body;
     
@@ -120,6 +120,13 @@ router.post('/register-admin', [verifyToken, isAdmin], async (req, res) => {
       role: 'admin'
     });
     
+    // Crear token JWT
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
     // Devolver respuesta sin incluir la contraseña
     const userResponse = {
       id: user.id,
@@ -130,7 +137,8 @@ router.post('/register-admin', [verifyToken, isAdmin], async (req, res) => {
     
     res.status(201).json({
       message: 'Administrador registrado correctamente',
-      user: userResponse
+      user: userResponse,
+      token
     });
   } catch (error) {
     console.error('Error al registrar administrador:', error);
