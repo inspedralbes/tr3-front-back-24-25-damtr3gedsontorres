@@ -3,6 +3,8 @@
  * Utiliza la misma sintaxis de fetch que el componente original
  */
 
+import { fetchWithAuth } from './httpInterceptor';
+
 // URL base para las peticiones
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -12,7 +14,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 export const fetchEnemies = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/enemies/`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/enemies/`);
     if (!response.ok) {
       throw new Error(`Error de servidor: ${response.status}`);
     }
@@ -45,7 +47,7 @@ export const saveEnemy = async (enemyData, isEditing) => {
       ? `${API_BASE_URL}/api/enemies/${enemyData.id}`
       : `${API_BASE_URL}/api/enemies/`;
       
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(processedData)
@@ -70,7 +72,7 @@ export const saveEnemy = async (enemyData, isEditing) => {
  */
 export const deleteEnemy = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/enemies/${id}`, { 
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/enemies/${id}`, { 
       method: 'DELETE' 
     });
     

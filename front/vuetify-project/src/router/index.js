@@ -43,7 +43,8 @@ const routes = [
   {
     path: '/admin/register',
     name: 'RegisterAdmin',
-    component: RegisterAdminPage
+    component: RegisterAdminPage,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   // Ruta de fallback
   {
@@ -59,23 +60,32 @@ const router = createRouter({
 
 // Guardia de navegación para proteger rutas
 router.beforeEach((to, from, next) => {
+  // Verificar si la ruta requiere autenticación
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
   
+  // Si la ruta no requiere autenticación, permitir acceso directamente
   if (!requiresAuth) {
-    // Si la ruta no requiere autenticación, permitir acceso
     next();
     return;
   }
   
-  if (!isAuthenticated()) {
-    // Si requiere autenticación pero el usuario no está autenticado
-    next({ path: '/login', query: { redirect: to.fullPath } });
+  // Comprobar autenticación
+  const authenticated = isAuthenticated();
+  console.log("Estado de autenticación en beforeEach:", authenticated);
+  
+  // Si la ruta requiere autenticación y el usuario no está autenticado
+  if (!authenticated) {
+    // Guardar la ruta a la que se intentaba acceder para redireccionar después del login
+    next({ 
+      path: '/login', 
+      query: { redirect: to.fullPath } 
+    });
     return;
   }
   
+  // Si la ruta requiere ser admin, verificar el rol
   if (requiresAdmin && !isAdmin()) {
-    // Si requiere ser admin pero el usuario no es admin
     alert('Acceso denegado: Se requieren permisos de administrador');
     next({ path: '/login' });
     return;

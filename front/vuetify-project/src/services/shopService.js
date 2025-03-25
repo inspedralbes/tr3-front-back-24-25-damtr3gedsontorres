@@ -2,6 +2,8 @@
  * Servicio para gestionar las operaciones relacionadas con la tienda (Shop)
  */
 
+import { fetchWithAuth } from './httpInterceptor';
+
 // URL base para las llamadas a la API, utilizando variable de entorno o valor por defecto
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -11,7 +13,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 const fetchShopItems = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shop/`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/shop/`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -31,7 +33,7 @@ const fetchShopItems = async () => {
  */
 const fetchAvailableShopItems = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shop/available`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/shop/available`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -52,16 +54,16 @@ const fetchAvailableShopItems = async () => {
  */
 const fetchShopItemById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shop/${id}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/shop/${id}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Error ${response.status}: No se pudo obtener el item #${id}`);
+      throw new Error(errorData?.message || `Error ${response.status}: No se pudo obtener el item con ID ${id}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en fetchShopItemById(${id}):`, error);
+    console.error(`Error en fetchShopItemById para ID ${id}:`, error);
     throw error;
   }
 };
@@ -75,12 +77,12 @@ const fetchShopItemById = async (id) => {
 const saveShopItem = async (shopItem, isUpdate = false) => {
   try {
     const url = isUpdate 
-      ? `${API_BASE_URL}/api/shop/${shopItem.id}` 
+      ? `${API_BASE_URL}/api/shop/${shopItem.id}`
       : `${API_BASE_URL}/api/shop/`;
     
     const method = isUpdate ? 'PUT' : 'POST';
     
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers: {
         'Content-Type': 'application/json'
@@ -90,12 +92,12 @@ const saveShopItem = async (shopItem, isUpdate = false) => {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Error ${response.status}: No se pudo ${isUpdate ? 'actualizar' : 'crear'} el item`);
+      throw new Error(errorData?.message || `Error ${response.status}: No se pudo guardar el item de la tienda`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en saveShopItem (${isUpdate ? 'update' : 'create'}):`, error);
+    console.error('Error en saveShopItem:', error);
     throw error;
   }
 };
@@ -107,18 +109,18 @@ const saveShopItem = async (shopItem, isUpdate = false) => {
  */
 const deleteShopItem = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shop/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/shop/${id}`, {
       method: 'DELETE'
     });
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Error ${response.status}: No se pudo eliminar el item #${id}`);
+      throw new Error(errorData?.message || `Error ${response.status}: No se pudo eliminar el item con ID ${id}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en deleteShopItem(${id}):`, error);
+    console.error(`Error en deleteShopItem para ID ${id}:`, error);
     throw error;
   }
 };
@@ -131,7 +133,7 @@ const deleteShopItem = async (id) => {
  */
 const updateShopItemAvailability = async (id, available) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shop/${id}/availability`, {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/shop/${id}/availability`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -141,12 +143,12 @@ const updateShopItemAvailability = async (id, available) => {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Error ${response.status}: No se pudo actualizar la disponibilidad del item #${id}`);
+      throw new Error(errorData?.message || `Error ${response.status}: No se pudo actualizar la disponibilidad del item`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en updateShopItemAvailability(${id}, ${available}):`, error);
+    console.error(`Error en updateShopItemAvailability para ID ${id}:`, error);
     throw error;
   }
 };

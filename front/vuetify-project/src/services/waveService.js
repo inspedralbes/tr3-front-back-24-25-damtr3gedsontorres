@@ -2,6 +2,8 @@
  * Servicio para gestionar las operaciones relacionadas con las oleadas (Waves)
  */
 
+import { fetchWithAuth } from './httpInterceptor';
+
 // URL base para las llamadas a la API, utilizando variable de entorno o valor por defecto
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -11,7 +13,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 const fetchWaves = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/waves/`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/waves/`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -32,7 +34,7 @@ const fetchWaves = async () => {
  */
 const fetchWavesByLevel = async (level) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/waves/level/${level}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/waves/level/${level}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -41,7 +43,7 @@ const fetchWavesByLevel = async (level) => {
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en fetchWavesByLevel(${level}):`, error);
+    console.error(`Error en fetchWavesByLevel para nivel ${level}:`, error);
     throw error;
   }
 };
@@ -53,16 +55,16 @@ const fetchWavesByLevel = async (level) => {
  */
 const fetchWaveById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/waves/${id}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/waves/${id}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Error ${response.status}: No se pudo obtener la oleada #${id}`);
+      throw new Error(errorData?.message || `Error ${response.status}: No se pudo obtener la oleada con ID ${id}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en fetchWaveById(${id}):`, error);
+    console.error(`Error en fetchWaveById para ID ${id}:`, error);
     throw error;
   }
 };
@@ -76,7 +78,7 @@ const fetchWaveById = async (id) => {
 const saveWave = async (wave, isUpdate = false) => {
   try {
     const url = isUpdate 
-      ? `${API_BASE_URL}/api/waves/${wave.id}` 
+      ? `${API_BASE_URL}/api/waves/${wave.id}`
       : `${API_BASE_URL}/api/waves/`;
     
     const method = isUpdate ? 'PUT' : 'POST';
@@ -89,7 +91,7 @@ const saveWave = async (wave, isUpdate = false) => {
       reward: Number(wave.reward)
     };
     
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers: {
         'Content-Type': 'application/json'
@@ -104,7 +106,7 @@ const saveWave = async (wave, isUpdate = false) => {
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en saveWave (${isUpdate ? 'update' : 'create'}):`, error);
+    console.error('Error en saveWave:', error);
     throw error;
   }
 };
@@ -116,18 +118,18 @@ const saveWave = async (wave, isUpdate = false) => {
  */
 const deleteWave = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/waves/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/waves/${id}`, {
       method: 'DELETE'
     });
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Error ${response.status}: No se pudo eliminar la oleada #${id}`);
+      throw new Error(errorData?.message || `Error ${response.status}: No se pudo eliminar la oleada con ID ${id}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error en deleteWave(${id}):`, error);
+    console.error(`Error en deleteWave para ID ${id}:`, error);
     throw error;
   }
 };
@@ -138,7 +140,7 @@ const deleteWave = async (id) => {
  */
 const fetchWaveStats = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/waves/stats`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/waves/stats`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);

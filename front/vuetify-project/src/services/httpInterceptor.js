@@ -4,7 +4,7 @@
  */
 
 // Clave para almacenar el token en localStorage
-const TOKEN_KEY = 'admin_auth_token';
+const TOKEN_KEY = 'auth_token';
 
 /**
  * Intercepta una petición fetch y añade el token de autenticación si existe
@@ -36,10 +36,11 @@ export const fetchWithAuth = async (url, options = {}) => {
   // Si la respuesta es 401 (Unauthorized), limpiar el token y redirigir al login
   if (response.status === 401) {
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem('admin_user_data');
+    localStorage.removeItem('user_data');
     
     // Si estamos en el navegador, redirigir al login
-    if (typeof window !== 'undefined') {
+    // Solo si no estamos ya en la página de login para evitar redirecciones en bucle
+    if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
       window.location.href = '/login';
     }
   }

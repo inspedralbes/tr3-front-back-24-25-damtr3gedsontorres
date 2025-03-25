@@ -3,6 +3,8 @@
  * Utiliza la misma sintaxis de fetch que el componente original
  */
 
+import { fetchWithAuth } from './httpInterceptor';
+
 // URL base para las peticiones
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -12,7 +14,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 export const fetchUsers = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/users/`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/users/`);
     if (!response.ok) {
       throw new Error(`Error de servidor: ${response.status}`);
     }
@@ -30,7 +32,7 @@ export const fetchUsers = async () => {
  */
 export const fetchUserById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/users/${id}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/users/${id}`);
     if (!response.ok) {
       throw new Error(`Error de servidor: ${response.status}`);
     }
@@ -54,7 +56,7 @@ export const saveUser = async (userData, isEditing) => {
       ? `${API_BASE_URL}/api/users/${userData.id}`
       : `${API_BASE_URL}/api/users/`;
       
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
@@ -79,7 +81,7 @@ export const saveUser = async (userData, isEditing) => {
  */
 export const deleteUser = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/users/${id}`, { 
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/users/${id}`, { 
       method: 'DELETE' 
     });
     

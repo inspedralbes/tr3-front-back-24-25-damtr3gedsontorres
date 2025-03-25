@@ -21,6 +21,7 @@ const WaveRoutes = require('./routes/tableRoutes/WaveRoutes');
 const WeaponRoutes = require('./routes/tableRoutes/WeaponRoutes');
 const PlayerRoutes = require('./routes/tableRoutes/PlayerRoutes');
 const AuthRoutes = require('./routes/authRoutes');
+const PlayerAuthRoutes = require('./routes/playerAuthRoutes');
 
 // Crear la aplicación Express
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/waves', WaveRoutes);
 app.use('/api/weapons', WeaponRoutes);
 app.use('/api/players', PlayerRoutes);
 app.use('/api/auth', AuthRoutes);
+app.use('/api/player-auth', PlayerAuthRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

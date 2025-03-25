@@ -3,6 +3,8 @@
  * Utiliza la misma sintaxis de fetch que el componente original
  */
 
+import { fetchWithAuth } from './httpInterceptor';
+
 // URL base para las peticiones
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -12,7 +14,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 export const fetchInventoryItems = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/inventory/`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/inventory/`);
     if (!response.ok) {
       throw new Error(`Error de servidor: ${response.status}`);
     }
@@ -30,7 +32,7 @@ export const fetchInventoryItems = async () => {
  */
 export const fetchInventoryByUser = async (userId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/inventory/user/${userId}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/inventory/user/${userId}`);
     if (!response.ok) {
       throw new Error(`Error de servidor: ${response.status}`);
     }
@@ -48,7 +50,7 @@ export const fetchInventoryByUser = async (userId) => {
  */
 export const fetchInventoryItemById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/inventory/${id}`);
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/inventory/${id}`);
     if (!response.ok) {
       throw new Error(`Error de servidor: ${response.status}`);
     }
@@ -72,7 +74,7 @@ export const saveInventoryItem = async (itemData, isEditing) => {
       ? `${API_BASE_URL}/api/inventory/${itemData.id}`
       : `${API_BASE_URL}/api/inventory/`;
       
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(itemData)
@@ -97,7 +99,7 @@ export const saveInventoryItem = async (itemData, isEditing) => {
  */
 export const deleteInventoryItem = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/inventory/${id}`, { 
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/inventory/${id}`, { 
       method: 'DELETE' 
     });
     

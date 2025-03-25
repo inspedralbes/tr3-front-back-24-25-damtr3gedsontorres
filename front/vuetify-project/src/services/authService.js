@@ -9,9 +9,9 @@ import { fetchWithAuth } from './httpInterceptor';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Clave para almacenar el token en localStorage
-const TOKEN_KEY = 'admin_auth_token';
+const TOKEN_KEY = 'auth_token';
 // Clave para almacenar los datos del usuario en localStorage
-const USER_KEY = 'admin_user_data';
+const USER_KEY = 'user_data';
 
 /**
  * Registra un nuevo administrador
@@ -20,7 +20,7 @@ const USER_KEY = 'admin_user_data';
  */
 export const registerAdmin = async (userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/register-admin`, {
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/auth/register-admin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
@@ -107,7 +107,34 @@ export const getCurrentUser = () => {
  * @returns {Boolean} True si hay un usuario autenticado
  */
 export const isAuthenticated = () => {
-  return !!localStorage.getItem(TOKEN_KEY);
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const userStr = localStorage.getItem(USER_KEY);
+    
+    // Si no hay token o datos de usuario, no está autenticado
+    if (!token || !userStr) {
+      return false;
+    }
+    
+    // Intentar parsear los datos del usuario
+    let user;
+    try {
+      user = JSON.parse(userStr);
+    } catch (e) {
+      console.error('Error al parsear datos de usuario:', e);
+      return false;
+    }
+    
+    // Verificar que el usuario tenga los campos necesarios
+    if (!user || !user.username) {
+      return false;
+    }
+    console.log('Usuario aut', user);
+    return true;
+  } catch (error) {
+    console.error('Error al verificar autenticación:', error);
+    return false;
+  }
 };
 
 /**

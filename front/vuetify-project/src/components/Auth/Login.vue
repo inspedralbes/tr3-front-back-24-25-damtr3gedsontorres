@@ -98,12 +98,28 @@ export default {
         console.log('Login exitoso:', result);
         
         // Mostrar mensaje de éxito
-        this.success = 'Inicio de sesión exitoso. Redirigiendo al dashboard...';
+        this.success = 'Inicio de sesión exitoso. Redirigiendo...';
         
         // Esperar un momento antes de redirigir para asegurar que el token se ha guardado
         setTimeout(() => {
-          console.log('Redirigiendo al dashboard...');
-          this.$router.push('/admin/dashboard');
+          // Verificar si hay una redirección pendiente en la URL
+          const redirectPath = this.$route.query.redirect;
+          
+          if (redirectPath) {
+            console.log('Redirigiendo a:', redirectPath);
+            this.$router.push(redirectPath);
+          } else {
+            // Si no hay redirección, ir al dashboard o a la página principal según el rol
+            const user = result.user;
+            if (user && user.role === 'admin') {
+              console.log('Redirigiendo al dashboard de admin...');
+              this.$router.push('/admin/dashboard');
+            } else {
+              console.log('Redirigiendo a la página principal...');
+              // Ajusta esta ruta según tu aplicación
+              this.$router.push('/game');
+            }
+          }
         }, 1000);
       } catch (error) {
         console.error('Error completo:', error);
