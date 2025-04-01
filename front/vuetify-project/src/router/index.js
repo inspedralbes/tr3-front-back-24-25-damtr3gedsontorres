@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '../components/AdminTables/Dashboard.vue'
 import Enemies from '../components/AdminTables/Enemies.vue'
-import Inventory from '../components/AdminTables/Inventory.vue'
+import Object from '../components/AdminTables/Object.vue'
 import Purchase from '../components/AdminTables/Purchase.vue'
 import User from '../components/AdminTables/User.vue'
 import Shop from '../components/AdminTables/Shop.vue'
 import Weapon from '../components/AdminTables/Weapon.vue'
 import Wave from '../components/AdminTables/Wave.vue'
+import GameStats from '../components/AdminTables/GameStats.vue'
 import LoginPage from '../pages/Auth/LoginPage.vue'
 import RegisterAdminPage from '../pages/Auth/RegisterAdminPage.vue'
 import { isAuthenticated, isAdmin } from '../services/authService'
@@ -32,12 +33,13 @@ const routes = [
     children: [
       { path: '', component: Enemies, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'enemies', component: Enemies, meta: { requiresAuth: true, requiresAdmin: true } },
-      { path: 'inventory', component: Inventory, meta: { requiresAuth: true, requiresAdmin: true } },
+      { path: 'objects', component: Object, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'purchase', component: Purchase, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'user', component: User, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'shop', component: Shop, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'weapon', component: Weapon, meta: { requiresAuth: true, requiresAdmin: true } },
-      { path: 'wave', component: Wave, meta: { requiresAuth: true, requiresAdmin: true } }
+      { path: 'wave', component: Wave, meta: { requiresAuth: true, requiresAdmin: true } },
+      { path: 'game-stats', component: GameStats, meta: { requiresAuth: true, requiresAdmin: true } }
     ]
   },
   {
@@ -76,6 +78,7 @@ router.beforeEach((to, from, next) => {
   
   // Si la ruta requiere autenticación y el usuario no está autenticado
   if (!authenticated) {
+    console.log(authenticated);
     // Guardar la ruta a la que se intentaba acceder para redireccionar después del login
     next({ 
       path: '/login', 

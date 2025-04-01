@@ -57,15 +57,6 @@ router.post('/register', async (req, res) => {
       id: player.id,
       username: player.username,
       email: player.email,
-      level: player.level,
-      experience: player.experience,
-      health: player.health,
-      maxHealth: player.maxHealth,
-      attack: player.attack,
-      defense: player.defense,
-      speed: player.speed,
-      currentWave: player.currentWave,
-      highestWave: player.highestWave
     };
     
     res.status(201).json({
@@ -116,18 +107,8 @@ router.post('/login', async (req, res) => {
     
     // Devolver respuesta sin incluir la contraseña
     const playerResponse = {
-      id: player.id,
       username: player.username,
       email: player.email,
-      level: player.level,
-      experience: player.experience,
-      health: player.health,
-      maxHealth: player.maxHealth,
-      attack: player.attack,
-      defense: player.defense,
-      speed: player.speed,
-      currentWave: player.currentWave,
-      highestWave: player.highestWave
     };
     
     res.json({
@@ -165,17 +146,7 @@ router.get('/validate-token', async (req, res) => {
       // Devolver respuesta sin incluir la contraseña
       const playerResponse = {
         id: player.id,
-        username: player.username,
-        email: player.email,
-        level: player.level,
-        experience: player.experience,
-        health: player.health,
-        maxHealth: player.maxHealth,
-        attack: player.attack,
-        defense: player.defense,
-        speed: player.speed,
-        currentWave: player.currentWave,
-        highestWave: player.highestWave
+        username: player.username
       };
       
       res.json({

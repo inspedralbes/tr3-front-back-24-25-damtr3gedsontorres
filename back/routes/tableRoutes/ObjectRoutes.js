@@ -1,5 +1,6 @@
 const express = require("express");
 const { Object } = require("../../database/sqlModels");
+const { Op } = require("sequelize");
 
 const router = express.Router();
 
@@ -22,6 +23,28 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Error al obtener los objetos" });
   }
 });
+
+// Obtener objeto por nombre (devuelve solo un objeto)
+router.get("/name/:name", async (req, res) => {
+  try {
+    const object = await Object.findOne({
+      where: {
+        name: {
+          [Op.like]: `%${req.params.name}%`
+        }
+      }
+    });
+
+    if (!object) {
+      return res.status(404).json({ error: "No se encontró un objeto con ese nombre" });
+    }
+
+    res.json(object);
+  } catch (error) {
+    res.status(500).json({ error: "Error al buscar el objeto por nombre" });
+  }
+});
+
 
 // Obtener un objeto por ID
 router.get("/:id", async (req, res) => {

@@ -11,9 +11,9 @@ dotenv.config();
 const sequelize = require('./database/config/sequelizeConfig');
 const syncDB = require('./database/config/sync');
 
-// Importar rutas
+// Importar rutas SQL
 const EnemyRoutes = require('./routes/tableRoutes/EneRoutes');
-const InventoryRoutes = require('./routes/tableRoutes/InventoryRoutes');
+const ObjectRoutes = require('./routes/tableRoutes/ObjectRoutes');
 const PurchaseRoutes = require('./routes/tableRoutes/PurchaseRoutes');
 const ShopRoutes = require('./routes/tableRoutes/ShopRoutes');
 const UserRoutes = require('./routes/tableRoutes/UserRoutes');
@@ -23,6 +23,10 @@ const PlayerRoutes = require('./routes/tableRoutes/PlayerRoutes');
 const AuthRoutes = require('./routes/authRoutes');
 const PlayerAuthRoutes = require('./routes/playerAuthRoutes');
 
+// Importar rutas MongoDB
+const GameRoutes = require('./routes/mongoRoutes/GameRoutes');
+const StatisticsRoutes = require('./routes/mongoRoutes/StatisticsRoutes');
+
 // Crear la aplicación Express
 const app = express();
 
@@ -31,9 +35,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Configurar rutas
+// Configurar rutas SQL
 app.use('/api/enemies', EnemyRoutes);
-app.use('/api/inventory', InventoryRoutes);
+app.use('/api/objects', ObjectRoutes);
 app.use('/api/purchases', PurchaseRoutes);
 app.use('/api/shop', ShopRoutes);
 app.use('/api/users', UserRoutes);
@@ -42,6 +46,10 @@ app.use('/api/weapons', WeaponRoutes);
 app.use('/api/players', PlayerRoutes);
 app.use('/api/auth', AuthRoutes);
 app.use('/api/player-auth', PlayerAuthRoutes);
+
+// Configurar rutas MongoDB
+app.use('/api/mongo/games', GameRoutes);
+app.use('/api/mongo/statistics', StatisticsRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

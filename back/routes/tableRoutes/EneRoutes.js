@@ -66,6 +66,24 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Obtener un enemigo por nombre
+router.get("/name/:name", async (req, res) => {
+  try {
+    const enemy = await Enemy.findOne({ where: { name: req.params.name } });
+    if (!enemy) {
+      return res.status(404).json({ error: "Enemigo no encontrado" });
+    }
+    res.json(enemy);
+  } catch (error) {
+    console.error("Error al obtener enemigo:", error);
+    res.status(500).json({
+      error: "Error al obtener el enemigo",
+      details: error.message
+    });
+  }
+});
+
+
 // Actualizar un enemigo
 router.put("/:id", async (req, res) => {
   try {

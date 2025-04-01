@@ -1,6 +1,6 @@
 // Importar todos los modelos
 const Enemy = require('./Enemy');
-const Inventory = require('./Inventory');
+const Object = require('./Object');
 const Purchase = require('./Purchase');
 const Shop = require('./Shop');
 const User = require('./User');
@@ -11,7 +11,7 @@ const Player = require('./Player');
 // Exportar todos los modelos
 module.exports = {
   Enemy,
-  Inventory,
+  Object,
   Purchase,
   Shop,
   User,

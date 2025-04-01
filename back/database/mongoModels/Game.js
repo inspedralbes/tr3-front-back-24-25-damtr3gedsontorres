@@ -1,17 +1,13 @@
 const mongoose = require("mongoose");
 
 const gameSchema = new mongoose.Schema({
-  user_id: { type: Number, required: true },
-  score: { type: Number, default: 0 },
-  waves_completed: { type: Number, default: 0 },
-  start_time: { type: Date, default: Date.now },
-  end_time: { type: Date },
-  enemies_defeated: [
-    { enemy_id: Number, count: Number }
-  ],
-  weapons_used: [
-    { weapon_id: Number, hits: Number }
-  ]
+  game_id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  play_time: { type: Number, required: true }, // Tiempo jugado en segundos
+  enemies_defeated: { type: Number, default: 0 },
+  user_email: { type: String, required: true }, // Correo del jugador
+  last_login: { type: Date, required: true },
+  bullets_used: { type: Number, default: 0 },
+  score: { type: Number, default: 0 } // Puntuación del jugador
 });
 
 module.exports = mongoose.model("Game", gameSchema);

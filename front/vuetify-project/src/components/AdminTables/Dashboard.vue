@@ -7,13 +7,14 @@ const router = useRouter()
 const isSidebarOpen = ref(true)
 
 const menuItems = [
-  { path: '/admin/enemies', name: 'Enemigos', icon: '👾' },
-  { path: '/admin/inventory', name: 'Inventario', icon: '🎒' },
-  { path: '/admin/purchase', name: 'Compras', icon: '💰' },
-  { path: '/admin/user', name: 'Usuario', icon: '👤' },
-  { path: '/admin/shop', name: 'Tienda', icon: '🏪' },
-  { path: '/admin/weapon', name: 'Armas', icon: '⚔️' },
-  { path: '/admin/wave', name: 'Oleadas', icon: '🌊' }
+  { path: '/admin/Dashboard/enemies', name: 'Enemigos', icon: '👾' },
+  { path: '/admin/Dashboard/objects', name: 'Objetos', icon: '📦' },
+  { path: '/admin/Dashboard/purchase', name: 'Compras', icon: '💰' },
+  { path: '/admin/Dashboard/user', name: 'Usuario', icon: '👤' },
+  { path: '/admin/Dashboard/shop', name: 'Tienda', icon: '🏪' },
+  { path: '/admin/Dashboard/weapon', name: 'Armas', icon: '⚔️' },
+  { path: '/admin/Dashboard/wave', name: 'Oleadas', icon: '🌊' },
+  { path: '/admin/Dashboard/game-stats', name: 'Estadísticas', icon: '📊' }
 ]
 
 const adminItems = [

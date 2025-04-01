@@ -21,12 +21,12 @@ const path = require('path');
 //     }
 // };
 
-const mongoUri = 'mongodb://root:example@mongodb:27017'; // Usuario, contraseña, host y DB
+const mongoUri = 'mongodb://root:example@mongodb:27017/'; // Usuario, contraseña, host y DB
 
 
 const connectDB = async () => {
     try {
-        console.log(`Conectando a la base de datos: ${mongoUri}`);
+        console.log(`Conectando a la base de datos`);
         await mongoose.connect(mongoUri, {
         });
         console.log(`Conexión exitosa a la base de datos`);
