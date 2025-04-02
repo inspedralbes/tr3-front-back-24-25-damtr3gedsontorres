@@ -6,7 +6,8 @@
 import { fetchWithAuth } from './httpInterceptor';
 
 // URL base para las llamadas a la API, utilizando variable de entorno o valor por defecto
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://187.33.149.132:3000';
+console.log('URL de la API:', API_BASE_URL);
 
 // Clave para almacenar el token en localStorage
 const TOKEN_KEY = 'auth_token';
