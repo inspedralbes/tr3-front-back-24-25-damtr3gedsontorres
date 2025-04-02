@@ -21,8 +21,8 @@ require('dotenv').config({ path: path.join(__dirname, '..', '..', 'environment',
 // );
 
 // Configuración de conexión a la base de datos
-const sequelize = new Sequelize("tr3-sql", "admin", "contraseña", {
-  host: 'mysql', // Cambia esto si usas Docker, ej: "db" si el servicio en Docker se llama "db"
+const sequelize = new Sequelize("a23edstorcev_knightOfTheSilverEclipseDB", "a23edstorcev_a23edstorcev", "(RZy+-C+/7]mJL?T", {
+  host: 'dam.inspedralbes.cat', // Cambia esto si usas Docker, ej: "db" si el servicio en Docker se llama "db"
   dialect: 'mysql', // Cambia a "postgres", "sqlite" o "mariadb" según tu base de datos
   logging: false, // Desactiva logs de SQL en la consola
 });

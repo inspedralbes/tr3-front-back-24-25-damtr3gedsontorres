@@ -4,9 +4,6 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
 
-// Cargar variables de entorno
-dotenv.config();
-
 // Importar la configuración de Sequelize y la función de sincronización
 const sequelize = require('./database/config/sequelizeConfig');
 const syncDB = require('./database/config/sync');
@@ -26,6 +23,9 @@ const PlayerAuthRoutes = require('./routes/playerAuthRoutes');
 // Importar rutas MongoDB
 const GameRoutes = require('./routes/mongoRoutes/GameRoutes');
 const StatisticsRoutes = require('./routes/mongoRoutes/StatisticsRoutes');
+
+// Cargar variables de entorno
+dotenv.config({ path: path.join(__dirname, 'environment', '.env') });
 
 // Crear la aplicación Express
 const app = express();
