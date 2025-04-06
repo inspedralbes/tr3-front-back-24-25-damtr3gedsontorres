@@ -23,6 +23,7 @@ const PlayerAuthRoutes = require('./routes/playerAuthRoutes');
 // Importar rutas MongoDB
 const GameRoutes = require('./routes/mongoRoutes/GameRoutes');
 const StatisticsRoutes = require('./routes/mongoRoutes/StatisticsRoutes');
+const StatsRoutes = require('./routes/statsRoutes');
 
 // Cargar variables de entorno
 dotenv.config({ path: path.join(__dirname, 'environment', '.env') });
@@ -34,6 +35,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Configurar directorio estático para archivos públicos
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Configurar directorio estático para archivos de Python
+app.use('/python', express.static(path.join(__dirname, 'python')));
 
 // Configurar rutas SQL
 app.use('/api/enemies', EnemyRoutes);
@@ -50,6 +57,9 @@ app.use('/api/player-auth', PlayerAuthRoutes);
 // Configurar rutas MongoDB
 app.use('/api/mongo/games', GameRoutes);
 app.use('/api/mongo/statistics', StatisticsRoutes);
+
+// Configurar rutas de estadísticas
+app.use('/api/stats', StatsRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

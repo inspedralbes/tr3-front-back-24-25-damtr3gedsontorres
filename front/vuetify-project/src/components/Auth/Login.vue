@@ -39,8 +39,6 @@
             </v-form>
           </v-card-text>
           <v-card-actions>
-            <v-btn text @click="goToRegisterAdmin">Registrarse como Admin</v-btn>
-            <v-spacer></v-spacer>
             <v-btn 
               color="primary" 
               @click="login" 

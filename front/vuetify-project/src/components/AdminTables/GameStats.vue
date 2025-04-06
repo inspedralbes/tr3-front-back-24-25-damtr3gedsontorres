@@ -210,7 +210,7 @@
             <p class="mt-4 text-body-1">Cargando estadísticas...</p>
           </div>
           
-          <div v-else>
+          <div v-else-if="!selectedEmail">
             <v-alert
               type="info"
               outlined
@@ -218,97 +218,330 @@
             >
               <v-row align="center">
                 <v-col class="grow">
-                  Esta sección está preparada para integrar gráficos generados con Python.
-                  Próximamente se implementará la conexión con el backend de Python para visualizar
-                  estadísticas avanzadas sobre las partidas.
+                  Selecciona un correo electrónico para generar estadísticas detalladas con Python.
+                  Se generarán gráficos de rendimiento para el jugador seleccionado.
                 </v-col>
                 <v-col class="shrink">
-                  <v-icon large>mdi-language-python</v-icon>
+                  <v-icon large>mdi-email-outline</v-icon>
+                </v-col>
+              </v-row>
+            </v-alert>
+            
+            <v-list class="email-list">
+              <v-subheader>Jugadores disponibles</v-subheader>
+              <v-list-item
+                v-for="email in uniqueEmails"
+                :key="email"
+                @click="selectEmail(email)"
+                link
+              >
+                <v-list-item-icon>
+                  <v-icon color="primary">mdi-account</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>{{ email }}</v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn
+                    icon
+                    color="primary"
+                    @click.stop="selectEmail(email)"
+                  >
+                    <v-icon>mdi-chart-bar</v-icon>
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+            </v-list>
+          </div>
+          
+          <div v-else-if="generatingStats" class="d-flex flex-column align-center py-5">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+              size="64"
+            ></v-progress-circular>
+            <p class="mt-4 text-body-1">Generando gráficos para {{ selectedEmail }}...</p>
+          </div>
+          
+          <div v-else-if="statsGenerated">
+            <v-alert
+              type="success"
+              outlined
+              class="mb-4"
+            >
+              <v-row align="center">
+                <v-col class="grow">
+                  Estadísticas generadas correctamente para <strong>{{ selectedEmail }}</strong>
+                </v-col>
+                <v-col class="shrink">
+                  <v-btn
+                    color="primary"
+                    outlined
+                    @click="selectedEmail = null"
+                  >
+                    Cambiar usuario
+                  </v-btn>
                 </v-col>
               </v-row>
             </v-alert>
             
             <v-row>
-              <v-col cols="12" sm="6">
+              <v-col cols="12" md="4">
                 <v-card outlined class="stats-card">
                   <v-card-title class="subtitle-1">
-                    <v-icon left color="primary">mdi-account-group</v-icon>
-                    Jugadores Activos
+                    <v-icon left color="primary">mdi-chart-pie</v-icon>
+                    Media de Enemigos
                   </v-card-title>
                   <v-card-text class="text-center">
-                    <span class="text-h4 font-weight-bold">{{ uniquePlayersCount }}</span>
-                    <div class="caption text-secondary mt-1">Jugadores únicos</div>
+                    <v-img
+                      v-if="graphPaths.pie"
+                      :src="graphPaths.pie"
+                      max-height="300"
+                      contain
+                      class="mx-auto"
+                      @error="handleImageError('pie')"
+                    ></v-img>
+                    <div v-else class="pa-5 text-center">
+                      <v-icon large color="grey lighten-1">mdi-image-off</v-icon>
+                      <p class="text-caption mt-2">{{ imageErrors.pie || 'Imagen no disponible' }}</p>
+                    </div>
+                    <div class="d-flex justify-center mt-2">
+                      <v-btn
+                        v-if="graphPaths.pie"
+                        small
+                        text
+                        color="primary"
+                        :href="graphPaths.pie"
+                        target="_blank"
+                      >
+                        <v-icon small left>mdi-open-in-new</v-icon>
+                        Ver en tamaño completo
+                      </v-btn>
+                      <v-btn
+                        small
+                        text
+                        color="secondary"
+                        @click="openImageInNewTab('pie')"
+                        class="ml-2"
+                      >
+                        <v-icon small left>mdi-link</v-icon>
+                        Ver URL
+                      </v-btn>
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" sm="6">
+              <v-col cols="12" md="4">
                 <v-card outlined class="stats-card">
                   <v-card-title class="subtitle-1">
-                    <v-icon left color="primary">mdi-trophy</v-icon>
-                    Puntuación Total
+                    <v-icon left color="primary">mdi-chart-bar</v-icon>
+                    Balas vs Enemigos
                   </v-card-title>
                   <v-card-text class="text-center">
-                    <span class="text-h4 font-weight-bold">{{ totalScore }}</span>
-                    <div class="caption text-secondary mt-1">Puntos acumulados</div>
+                    <v-img
+                      v-if="graphPaths.bar"
+                      :src="graphPaths.bar"
+                      max-height="300"
+                      contain
+                      class="mx-auto"
+                      @error="handleImageError('bar')"
+                    ></v-img>
+                    <div v-else class="pa-5 text-center">
+                      <v-icon large color="grey lighten-1">mdi-image-off</v-icon>
+                      <p class="text-caption mt-2">{{ imageErrors.bar || 'Imagen no disponible' }}</p>
+                    </div>
+                    <div class="d-flex justify-center mt-2">
+                      <v-btn
+                        v-if="graphPaths.bar"
+                        small
+                        text
+                        color="primary"
+                        :href="graphPaths.bar"
+                        target="_blank"
+                      >
+                        <v-icon small left>mdi-open-in-new</v-icon>
+                        Ver en tamaño completo
+                      </v-btn>
+                      <v-btn
+                        small
+                        text
+                        color="secondary"
+                        @click="openImageInNewTab('bar')"
+                        class="ml-2"
+                      >
+                        <v-icon small left>mdi-link</v-icon>
+                        Ver URL
+                      </v-btn>
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
               
-              <v-col cols="12" sm="6">
+              <v-col cols="12" md="4">
                 <v-card outlined class="stats-card">
                   <v-card-title class="subtitle-1">
-                    <v-icon left color="primary">mdi-clock-outline</v-icon>
-                    Tiempo Total de Juego
+                    <v-icon left color="primary">mdi-chart-line</v-icon>
+                    Balas por Partida
                   </v-card-title>
                   <v-card-text class="text-center">
-                    <span class="text-h4 font-weight-bold">{{ formatTotalPlayTime }}</span>
-                    <div class="caption text-secondary mt-1">Horas acumuladas</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              
-              <v-col cols="12" sm="6">
-                <v-card outlined class="stats-card">
-                  <v-card-title class="subtitle-1">
-                    <v-icon left color="primary">mdi-ghost</v-icon>
-                    Enemigos Derrotados
-                  </v-card-title>
-                  <v-card-text class="text-center">
-                    <span class="text-h4 font-weight-bold">{{ totalEnemiesDefeated }}</span>
-                    <div class="caption text-secondary mt-1">En todas las partidas</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              
-              <v-col cols="12" sm="6">
-                <v-card outlined class="stats-card">
-                  <v-card-title class="subtitle-1">
-                    <v-icon left color="primary">mdi-bullet</v-icon>
-                    Balas Utilizadas
-                  </v-card-title>
-                  <v-card-text class="text-center">
-                    <span class="text-h4 font-weight-bold">{{ totalBulletsUsed }}</span>
-                    <div class="caption text-secondary mt-1">En todas las partidas</div>
+                    <v-img
+                      v-if="graphPaths.line"
+                      :src="graphPaths.line"
+                      max-height="300"
+                      contain
+                      class="mx-auto"
+                      @error="handleImageError('line')"
+                    ></v-img>
+                    <div v-else class="pa-5 text-center">
+                      <v-icon large color="grey lighten-1">mdi-image-off</v-icon>
+                      <p class="text-caption mt-2">{{ imageErrors.line || 'Imagen no disponible' }}</p>
+                    </div>
+                    <div class="d-flex justify-center mt-2">
+                      <v-btn
+                        v-if="graphPaths.line"
+                        small
+                        text
+                        color="primary"
+                        :href="graphPaths.line"
+                        target="_blank"
+                      >
+                        <v-icon small left>mdi-open-in-new</v-icon>
+                        Ver en tamaño completo
+                      </v-btn>
+                      <v-btn
+                        small
+                        text
+                        color="secondary"
+                        @click="openImageInNewTab('line')"
+                        class="ml-2"
+                      >
+                        <v-icon small left>mdi-link</v-icon>
+                        Ver URL
+                      </v-btn>
+                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
             </v-row>
             
-            <div class="text-center mt-6">
-              <v-btn
-                color="primary"
-                outlined
-                @click="generatePythonStats"
-                :loading="generatingStats"
-              >
-                <v-icon left>mdi-refresh</v-icon>
-                Generar Gráficos con Python
-              </v-btn>
-              <p class="caption mt-2">
-                Esta función conectará con un backend de Python para generar gráficos avanzados
-              </p>
-            </div>
+            <v-row class="mt-4">
+              <v-col cols="12" md="8">
+                <v-card outlined>
+                  <v-card-title class="subtitle-1">
+                    <v-icon left color="primary">mdi-information-outline</v-icon>
+                    Resumen de Estadísticas
+                  </v-card-title>
+                  <v-card-text>
+                    <v-simple-table>
+                      <template v-slot:default>
+                        <tbody>
+                          <tr>
+                            <td class="font-weight-medium">Total de partidas:</td>
+                            <td>{{ userGamesCount }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-medium">Puntuación total:</td>
+                            <td>{{ userTotalScore }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-medium">Enemigos derrotados:</td>
+                            <td>{{ userTotalEnemies }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-medium">Balas utilizadas:</td>
+                            <td>{{ userTotalBullets }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-medium">Tiempo de juego:</td>
+                            <td>{{ formatPlayTime(userTotalPlayTime) }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-medium">Eficiencia (enemigos/bala):</td>
+                            <td>{{ userTotalBullets > 0 ? (userTotalEnemies / userTotalBullets).toFixed(2) : 'N/A' }}</td>
+                          </tr>
+                        </tbody>
+                      </template>
+                    </v-simple-table>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              
+              <v-col cols="12" md="4">
+                <v-card outlined>
+                  <v-card-title class="subtitle-1">
+                    <v-icon left color="primary">mdi-refresh-circle</v-icon>
+                    Actualizar Gráficos
+                  </v-card-title>
+                  <v-card-text class="text-center">
+                    <p class="mb-3">¿Los gráficos no se muestran correctamente?</p>
+                    <v-btn
+                      color="primary"
+                      @click="regenerateStats"
+                      :loading="generatingStats"
+                      :disabled="generatingStats"
+                    >
+                      <v-icon left>mdi-refresh</v-icon>
+                      Regenerar estadísticas
+                    </v-btn>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+            
+            <v-row v-if="pythonOutput" class="mt-4">
+              <v-col cols="12">
+                <v-card outlined>
+                  <v-card-title class="subtitle-1">
+                    <v-icon left color="primary">mdi-console</v-icon>
+                    Salida del Proceso Python
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      icon
+                      small
+                      @click="showPythonOutput = !showPythonOutput"
+                      :title="showPythonOutput ? 'Ocultar detalles' : 'Mostrar detalles'"
+                    >
+                      <v-icon>{{ showPythonOutput ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                    </v-btn>
+                  </v-card-title>
+                  <v-expand-transition>
+                    <v-card-text v-if="showPythonOutput">
+                      <v-alert
+                        type="info"
+                        text
+                        dense
+                      >
+                        Esta información es útil para depuración.
+                      </v-alert>
+                      <pre class="python-output">{{ pythonOutput }}</pre>
+                    </v-card-text>
+                  </v-expand-transition>
+                </v-card>
+              </v-col>
+            </v-row>
+          </div>
+          
+          <div v-else>
+            <v-alert
+              type="warning"
+              outlined
+              class="mb-4"
+            >
+              <v-row align="center">
+                <v-col class="grow">
+                  Ocurrió un error al generar las estadísticas. Por favor, inténtalo de nuevo.
+                </v-col>
+                <v-col class="shrink">
+                  <v-btn
+                    color="warning"
+                    @click="generatePythonStats()"
+                  >
+                    Reintentar
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-alert>
           </div>
         </v-card-text>
       </v-card>
@@ -330,6 +563,23 @@ const generatingStats = ref(false);
 const detailDialog = ref(false);
 const statsDialog = ref(false);
 const selectedGame = ref(null);
+const selectedEmail = ref(null);
+const statsGenerated = ref(false);
+const graphPaths = ref({
+  pie: null,
+  bar: null,
+  line: null
+});
+const imageErrors = ref({
+  pie: null,
+  bar: null,
+  line: null
+});
+const pythonOutput = ref('');
+const showPythonOutput = ref(false);
+
+// URL base para las peticiones API
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Cabeceras para la tabla
 const headers = ref([
@@ -367,6 +617,38 @@ const totalEnemiesDefeated = computed(() => {
 
 const totalBulletsUsed = computed(() => {
   return games.value.reduce((total, game) => total + (game.bullets_used || 0), 0);
+});
+
+// Emails únicos para selección
+const uniqueEmails = computed(() => {
+  const emails = new Set(games.value.map(game => game.user_email));
+  return Array.from(emails);
+});
+
+// Estadísticas del usuario seleccionado
+const userGames = computed(() => {
+  if (!selectedEmail.value) return [];
+  return games.value.filter(game => game.user_email === selectedEmail.value);
+});
+
+const userGamesCount = computed(() => {
+  return userGames.value.length;
+});
+
+const userTotalScore = computed(() => {
+  return userGames.value.reduce((total, game) => total + (game.score || 0), 0);
+});
+
+const userTotalEnemies = computed(() => {
+  return userGames.value.reduce((total, game) => total + (game.enemies_defeated || 0), 0);
+});
+
+const userTotalBullets = computed(() => {
+  return userGames.value.reduce((total, game) => total + (game.bullets_used || 0), 0);
+});
+
+const userTotalPlayTime = computed(() => {
+  return userGames.value.reduce((total, game) => total + (game.play_time || 0), 0);
 });
 
 // Métodos
@@ -441,27 +723,116 @@ const viewGameDetails = (game) => {
 const openStatsDialog = () => {
   loadingStats.value = true;
   statsDialog.value = true;
+  selectedEmail.value = null;
+  statsGenerated.value = false;
   
-  // Simulamos la carga de estadísticas
+  // Simulamos la carga de la lista de usuarios
   setTimeout(() => {
     loadingStats.value = false;
   }, 1000);
 };
 
-const generatePythonStats = () => {
-  generatingStats.value = true;
+const selectEmail = (email) => {
+  selectedEmail.value = email;
+  generatePythonStats();
+};
+
+const generatePythonStats = async () => {
+  if (!selectedEmail.value) return;
   
-  // Simulamos la generación de estadísticas con Python
-  setTimeout(() => {
+  generatingStats.value = true;
+  statsGenerated.value = false;
+  imageErrors.value = { pie: null, bar: null, line: null };
+  pythonOutput.value = '';
+  
+  try {
+    // Llamar al endpoint para generar estadísticas
+    const response = await fetch(`${API_BASE_URL}/api/stats/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: selectedEmail.value })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al generar estadísticas');
+    }
+    
+    const data = await response.json();
+    console.log('Respuesta del servidor:', data);
+    
+    // Añadimos un timestamp para evitar el caché del navegador
+    const timestamp = Date.now();
+    
+    // Establecer las rutas a los gráficos
+    graphPaths.value = {
+      pie: data.graphPaths && data.graphPaths.graf1 ? `${API_BASE_URL}${data.graphPaths.graf1}?t=${timestamp}` : null,
+      bar: data.graphPaths && data.graphPaths.graf2 ? `${API_BASE_URL}${data.graphPaths.graf2}?t=${timestamp}` : null,
+      line: data.graphPaths && data.graphPaths.graf3 ? `${API_BASE_URL}${data.graphPaths.graf3}?t=${timestamp}` : null
+    };
+    
+    console.log('URLs de los gráficos:', graphPaths.value);
+    
+    // Mostrar la salida del script Python
+    pythonOutput.value = data.output || 'No hay información disponible sobre la ejecución del script.';
+    
+    // Actualizar datos de resumen si están disponibles
+    if (data.summaryData) {
+      userGamesCount.value = data.summaryData.totalGames || 0;
+      userTotalScore.value = 0; // No disponible en la salida actual
+      userTotalEnemies.value = data.summaryData.totalEnemies || 0;
+      userTotalBullets.value = data.summaryData.totalBullets || 0;
+      userTotalPlayTime.value = data.summaryData.totalPlayTime || 0;
+    }
+    
+    statsGenerated.value = true;
+    showNotification(`Estadísticas generadas para ${selectedEmail.value}`, 'success');
+    
+  } catch (error) {
+    console.error('Error al generar estadísticas:', error);
+    showNotification('Error al generar estadísticas', 'error');
+    statsGenerated.value = false;
+    pythonOutput.value = `Error: ${error.message}`;
+  } finally {
     generatingStats.value = false;
-    showNotification('La integración con Python está en desarrollo', 'info');
-  }, 1500);
+  }
+};
+
+const handleImageError = (type) => {
+  imageErrors.value[type] = `No se pudo cargar la imagen. Es posible que no se haya generado correctamente.`;
+};
+
+const regenerateStats = () => {
+  if (selectedEmail.value) {
+    generatePythonStats();
+  }
 };
 
 const showNotification = (text, color = 'success') => {
   // Esta función se puede implementar con el sistema de notificaciones que utilices
   console.log(`[${color}] ${text}`);
   // Si tienes un sistema de notificaciones, úsalo aquí
+};
+
+const openImageInNewTab = (type) => {
+  if (graphPaths.value[type]) {
+    // Mostrar la URL en un diálogo
+    alert(`URL de la imagen: ${graphPaths.value[type]}`);
+    
+    // Verificar que la URL sea válida antes de abrirla
+    const url = graphPaths.value[type];
+    if (url && typeof url === 'string' && !url.includes('undefined')) {
+      // Abrir en una nueva pestaña
+      window.open(url, '_blank');
+    } else {
+      console.error('URL inválida:', url);
+      showNotification('URL de imagen inválida', 'error');
+    }
+  } else {
+    showNotification('No hay URL disponible para esta imagen', 'error');
+  }
 };
 
 // Ciclo de vida
@@ -485,11 +856,22 @@ onMounted(() => {
 
 .stats-card {
   height: 100%;
-  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
 }
 
-.stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.email-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.python-output {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow-y: auto;
 }
 </style>

@@ -124,11 +124,59 @@ export const deleteGame = async (id) => {
   }
 };
 
+/**
+ * Genera estadísticas de juego utilizando Python para un usuario específico
+ * @param {String} email - Email del usuario para generar estadísticas
+ * @returns {Promise<Object>} Resultado de la operación y rutas de los gráficos generados
+ */
+export const generateGameStats = async (email) => {
+  try {
+    // Llamada real al endpoint que ejecuta el script de Python
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/stats/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al generar estadísticas');
+    }
+    
+    const data = await response.json();
+    
+    // Si no tenemos rutas de gráficos en la respuesta, usamos rutas predeterminadas
+    if (!data.graphPaths || Object.keys(data.graphPaths).length === 0) {
+      data.graphPaths = {
+        graf1: `${API_BASE_URL}/api/stats/${email.replace('@', '_at_')}/graf1_enemies_avg.png`,
+        graf2: `${API_BASE_URL}/api/stats/${email.replace('@', '_at_')}/graf2_bullets_vs_enemies.png`,
+        graf3: `${API_BASE_URL}/api/stats/${email.replace('@', '_at_')}/graf3_bullets_used.png`
+      };
+    }
+    
+    return {
+      success: true,
+      message: data.message || `Estadísticas generadas para ${email}`,
+      graphPaths: {
+        pie: data.graphPaths.graf1 || `${API_BASE_URL}/api/stats/${email.replace('@', '_at_')}/graf1_enemies_avg.png`,
+        bar: data.graphPaths.graf2 || `${API_BASE_URL}/api/stats/${email.replace('@', '_at_')}/graf2_bullets_vs_enemies.png`,
+        line: data.graphPaths.graf3 || `${API_BASE_URL}/api/stats/${email.replace('@', '_at_')}/graf3_bullets_used.png`
+      },
+      output: data.output
+    };
+    
+  } catch (error) {
+    console.error(`Error al generar estadísticas para ${email}:`, error);
+    throw error;
+  }
+};
+
 export default {
   fetchGames,
   fetchGamesByEmail,
   fetchGameById,
   createGame,
   updateGame,
-  deleteGame
+  deleteGame,
+  generateGameStats
 };

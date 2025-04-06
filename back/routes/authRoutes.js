@@ -200,6 +200,40 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/create-admin', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Validar datos
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Nombre de usuario, correo electrónico y contraseña son obligatorios' });
+    }
+
+    // Verificar si ya existe un usuario con ese nombre o email
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'El correo electrónico ya está en uso' });
+    }
+
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10); 
+
+    // Crear el primer usuario administrador
+    const user = await User.create({
+      username: username,
+      email: email,
+      password: hashedPassword,
+      role: 'admin' // Si tu modelo tiene un campo de rol, asegúrate de incluirlo.
+    });
+
+    res.status(201).json({ message: 'Administrador creado con éxito', user: { username: user.username, email: user.email } });
+
+  } catch (error) {
+    console.error('Error en /create-admin:', error);
+    res.status(500).json({ error: 'Ocurrió un error al crear el administrador', details: error.message });
+  }
+});
+
 /**
  * @route GET /api/auth/check-admin-exists
  * @desc Verificar si existe algún administrador en el sistema

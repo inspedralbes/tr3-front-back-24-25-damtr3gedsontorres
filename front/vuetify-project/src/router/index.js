@@ -34,11 +34,12 @@ const routes = [
       { path: '', component: Enemies, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'enemies', component: Enemies, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'objects', component: Object, meta: { requiresAuth: true, requiresAdmin: true } },
-      { path: 'purchase', component: Purchase, meta: { requiresAuth: true, requiresAdmin: true } },
+      // Rutas comentadas para ocultar las vistas
+      // { path: 'purchase', component: Purchase, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'user', component: User, meta: { requiresAuth: true, requiresAdmin: true } },
-      { path: 'shop', component: Shop, meta: { requiresAuth: true, requiresAdmin: true } },
-      { path: 'weapon', component: Weapon, meta: { requiresAuth: true, requiresAdmin: true } },
-      { path: 'wave', component: Wave, meta: { requiresAuth: true, requiresAdmin: true } },
+      // { path: 'shop', component: Shop, meta: { requiresAuth: true, requiresAdmin: true } },
+      // { path: 'weapon', component: Weapon, meta: { requiresAuth: true, requiresAdmin: true } },
+      // { path: 'wave', component: Wave, meta: { requiresAuth: true, requiresAdmin: true } },
       { path: 'game-stats', component: GameStats, meta: { requiresAuth: true, requiresAdmin: true } }
     ]
   },
